@@ -75,7 +75,8 @@ class Converter(object):
 
     def convert_segment(self, segment):
         (data, timestamp, samples, unit) = segment.get_data (0)
-        #print data, timestamp, samples, unit
+        group = self._groups[segment.entity_type]
+        dset = group.create_dataset(segment.label, data=data.T)
 
     def convert_neural(self, neural):
         print "FIXME: neural"
