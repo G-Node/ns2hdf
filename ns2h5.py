@@ -36,7 +36,7 @@ class Converter(object):
         self._groups = {}
         self._groups[1] = h5.create_group('Event')
         self._groups[2] = h5.create_group('Analog')
-        self._groups[3] = h5.create_group('Segemnt')
+        self._groups[3] = h5.create_group('Segment')
         self._groups[4] = h5.create_group('Neural')
         self.convert_map = {1 : self.convert_event,
                             2 : self.convert_analog,
