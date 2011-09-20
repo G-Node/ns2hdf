@@ -74,6 +74,9 @@ class Converter(object):
         dset.attrs['SampleRate'] = analog.sample_rate
 
     def convert_segment(self, segment):
+        if not segment.item_count:
+            return
+
         (data, timestamp, samples, unit) = segment.get_data (0)
         group = self._groups[segment.entity_type]
         dset = group.create_dataset(segment.label, data=data.T)
