@@ -82,7 +82,10 @@ class Converter(object):
         dset = group.create_dataset(segment.label, data=data.T)
 
     def convert_neural(self, neural):
-        print "FIXME: neural"
+        data = neural.get_data ()
+        group = self._groups[neural.entity_type]
+        name = "%d - %s" % (neural.id, neural.label)
+        group.create_dataset(name, data=data)
 
     def dtype_by_event(self, event):
         type_map = { ns.EventEntity.EVENT_TEXT  : 's',
