@@ -34,10 +34,6 @@ class Converter(object):
         self._nf = nf
         self._h5 = h5
         self._groups = {}
-        self._groups[1] = h5.create_group('Event')
-        self._groups[2] = h5.create_group('Analog')
-        self._groups[3] = h5.create_group('Segment')
-        self._groups[4] = h5.create_group('Neural')
         self.convert_map = {1 : self.convert_event,
                             2 : self.convert_analog,
                             3 : self.convert_segment,
@@ -45,6 +41,20 @@ class Converter(object):
         if not progress:
             progress = ProgressIndicator()
         self._progress = progress
+
+
+    def get_group_for_type(self, entity_type):
+        name_map = { 1 : 'Event',
+                     2 : 'Analog',
+                     3 : 'Segment',
+                     4 : 'Neural'}
+
+        if not self._groups.has_key(entity_type):
+            name = name_map[entity_type]
+            group = self._h5.create_group(name)
+            self._groups[entity_type] = group
+
+        return self._groups[entity_type]
 
     def convert(self):
         progress = self._progress
@@ -63,12 +73,12 @@ class Converter(object):
         for n in xrange(0, event.item_count):
             data[n] = event.get_data (n)
         if nitems > 0:
-            group = self._groups[event.entity_type]
+            group = self.get_group_for_type(event.entity_type)
             dset = group.create_dataset(event.label, data=data)
 
     def convert_analog(self, analog):
         (data, times, ic) = analog.get_data ()
-        group = self._groups[analog.entity_type]
+        group = self.get_group_for_type(analog.entity_type)
         d_t =  np.vstack((times, data)).T
         dset = group.create_dataset(analog.label, data=d_t)
         dset.attrs['SampleRate'] = analog.sample_rate
@@ -78,7 +88,7 @@ class Converter(object):
             return
 
         (data, timestamp, samples, unit) = segment.get_data (0)
-        group = self._groups[segment.entity_type]
+        group = self.get_group_for_type(segment.entity_type)
         dset = group.create_dataset(segment.label, data=data.T)
 
     def convert_neural(self, neural):
