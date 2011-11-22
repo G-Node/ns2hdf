@@ -26,8 +26,8 @@ class Converter(object):
     def __init__(self, filepath, output=None, progress=None):
         if not output:
             (basefile, ext) = os.path.splitext (filepath)
-            output = "%s.hdf5" % (basefile)
-
+            output = "%s.hdf5" % basefile
+            
         nf = ns.File(filepath)
         h5 = h5py.File(output, 'w')
 
