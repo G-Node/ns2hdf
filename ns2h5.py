@@ -87,9 +87,16 @@ class Converter(object):
         if not segment.item_count:
             return
 
-        (data, timestamp, samples, unit) = segment.get_data (0)
         group = self.get_group_for_type(segment.entity_type)
-        dset = group.create_dataset(segment.label, data=data.T)
+        seg_group = group.create_group(segment.label)
+        
+        for index in xrange(0,segment.item_count):
+            (data, timestamp, samples, unit) = segment.get_data (index)
+            name = '%d - %f' % (index, timestamp)
+            dset = seg_group.create_dataset(name, data=data.T)
+            dset.attrs['Timestamp'] = timestamp
+            dset.attrs['Unit'] = unit
+            dset.attrs['Index'] = index
 
     def convert_neural(self, neural):
         data = neural.get_data ()
