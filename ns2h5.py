@@ -59,6 +59,7 @@ class Converter(object):
     def convert(self):
         progress = self._progress
         progress.setup (len(self._nf.entities))
+        self.copy_metdata(self._h5, self._nf.metadata_raw)
         for entity in self._nf.entities:
             conv = self.convert_map[entity.entity_type]
             conv(entity)
