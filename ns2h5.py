@@ -72,9 +72,9 @@ class Converter(object):
         data = np.empty([nitems], dtype)
         for n in xrange(0, event.item_count):
             data[n] = event.get_data (n)
-        if nitems > 0:
-            group = self.get_group_for_type(event.entity_type)
-            dset = group.create_dataset(event.label, data=data)
+
+        group = self.get_group_for_type(event.entity_type)
+        dset = group.create_dataset(event.label, data=data)
 
     def convert_analog(self, analog):
         (data, times, ic) = analog.get_data ()
