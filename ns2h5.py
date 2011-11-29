@@ -104,6 +104,12 @@ class Converter(object):
         name = "%d - %s" % (neural.id, neural.label)
         group.create_dataset(name, data=data)
 
+    def copy_metdata(self, target, metadata, prefix=None):
+        for (key, value) in metadata.iteritems():
+            if prefix is not None:
+                key = prefix + key
+            target.attrs[key] = value
+
     def dtype_by_event(self, event):
         type_map = { ns.EventEntity.EVENT_TEXT  : 's',
                      ns.EventEntity.EVENT_CSV   : 's',
