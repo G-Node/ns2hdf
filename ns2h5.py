@@ -133,14 +133,22 @@ class Converter(object):
 class ConsoleIndicator(ProgressIndicator):
     def __init__(self):
         super(ConsoleIndicator, self).__init__()
+        self._size = 60
 
     def progress(self,  max_value, cur_value):
-        size = 60
+        size = self._size
         prefix = "Converting"
         x = int (size*cur_value/max_value)
-        sys.stdout.write("%s [%s%s] %i/%i\r" % (prefix, "#"*x, "." * (size-x),
-                                                cur_value, max_value))
+        msg = "%s [%s%s] %i/%i\r" % (prefix, "#"*x, "." * (size-x),
+                                     cur_value, max_value)
+        self._last_msg = msg
+        sys.stdout.write(msg)
         sys.stdout.flush()
+
+    def cleanup(self):
+        sys.stdout.write('%s\r' % (' '*len(self._last_msg)))
+        sys.stdout.flush()
+
 
 def main(argv):
     opts, rem = getopt.getopt(sys.argv[1:], 'o:', ['output=',
@@ -159,6 +167,7 @@ def main(argv):
     ci = ConsoleIndicator()
     converter = Converter(filename, output, progress=ci);
     converter.convert()
+    ci.cleanup()
     return 0
 
 if __name__ == "__main__":
