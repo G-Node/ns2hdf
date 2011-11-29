@@ -75,13 +75,14 @@ class Converter(object):
 
         group = self.get_group_for_type(event.entity_type)
         dset = group.create_dataset(event.label, data=data)
+        self.copy_metdata(dset, event.metadata_raw)
 
     def convert_analog(self, analog):
         (data, times, ic) = analog.get_data ()
         group = self.get_group_for_type(analog.entity_type)
         d_t =  np.vstack((times, data)).T
         dset = group.create_dataset(analog.label, data=d_t)
-        dset.attrs['SampleRate'] = analog.sample_rate
+        self.copy_metdata(dset, analog.metadata_raw)
 
     def convert_segment(self, segment):
         if not segment.item_count:
@@ -89,7 +90,13 @@ class Converter(object):
 
         group = self.get_group_for_type(segment.entity_type)
         seg_group = group.create_group(segment.label)
-        
+        self.copy_metdata(seg_group, segment.metadata_raw)
+
+        for index in xrange(0, segment.source_count):
+            source = segment.sources[index]
+            name = 'SourceInfo.%d.' % index
+            self.copy_metdata(seg_group, source.metadata_raw, prefix=name)
+
         for index in xrange(0,segment.item_count):
             (data, timestamp, samples, unit) = segment.get_data (index)
             name = '%d - %f' % (index, timestamp)
@@ -102,7 +109,8 @@ class Converter(object):
         data = neural.get_data ()
         group = self._groups[neural.entity_type]
         name = "%d - %s" % (neural.id, neural.label)
-        group.create_dataset(name, data=data)
+        dset = group.create_dataset(name, data=data)
+        self.copy_metdata(dset, neural.metadata_raw)
 
     def copy_metdata(self, target, metadata, prefix=None):
         for (key, value) in metadata.iteritems():
